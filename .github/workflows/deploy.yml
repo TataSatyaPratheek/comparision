@@ -1,0 +1,72 @@
+name: Build and Deploy Flutter App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_android:
+    name: Build and Deploy Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Android App Bundle
+        run: flutter build appbundle --release
+
+      - name: Setup Keystore
+        run: |
+          echo "${{ secrets.KEY_JKS }}" | base64 -d > ./android/app/key.jks
+          echo "storePassword=${{ secrets.STORE_PASSWORD }}" > ./android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> ./android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> ./android/key.properties
+          echo "storeFile=key.jks" >> ./android/key.properties
+
+      - name: Deploy to Google Play
+        uses: maierj/fastlane-action@v2.3.0
+        with:
+          lane: deploy
+          subdirectory: android
+
+  build_ios:
+    name: Build and Deploy iOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - name: Install CocoaPods
+        run: brew install cocoapods
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build iOS IPA
+        run: flutter build ipa --release
+
+      - name: Deploy to TestFlight
+        uses: maierj/fastlane-action@v2.3.0
+        with:
+          lane: deploy
+          subdirectory: ios
