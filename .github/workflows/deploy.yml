@@ -45,6 +45,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ruby-full
           gem install bundler
+      
+      - name: List Build Directory
+        run: ls -R ../build/app/outputs/bundle/release/ # List contents to verify AAB generation
 
       - name: Setup Google Play Service Account Key
         run: |
