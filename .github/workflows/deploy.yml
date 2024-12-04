@@ -59,7 +59,9 @@ jobs:
 
       - name: Setup Google Play Service Account Key
         run: |
-          echo "${{ secrets.GOOGLE_PLAY_JSON_KEY }}" > android/google_play_service_account.json
+          echo "${{ secrets.GOOGLE_PLAY_JSON_KEY }}" | base64 -d > android/google_play_service_account.json
+          # Check if the file is valid JSON
+          cat android/google_play_service_account.json | jq empty
 
       - name: Verify Service Account Key
         run: |
