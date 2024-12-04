@@ -3,10 +3,15 @@ default_platform(:android)
 platform :android do
   desc "Deploy a new version to Google Play"
   lane :deploy do
-    # Ensure the JSON key is set up for authentication
-    if ENV['GOOGLE_PLAY_JSON_KEY'].nil? || ENV['GOOGLE_PLAY_JSON_KEY'].empty?
+    # Check if the JSON key is set
+    json_key = ENV['GOOGLE_PLAY_JSON_KEY']
+    
+    if json_key.nil? || json_key.empty?
       UI.user_error!("Please set the GOOGLE_PLAY_JSON_KEY environment variable.")
     end
+
+    # Write the JSON key to a temporary file for authentication
+    File.write("google_play_service_account.json", json_key)
 
     upload_to_play_store(
       track: 'internal', # Options: internal, alpha, beta, production
@@ -14,7 +19,7 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
       aab: '../build/app/outputs/bundle/release/app-release.aab',
-      json_key: ENV['GOOGLE_PLAY_JSON_KEY'] # Use environment variable for authentication
+      json_key: "google_play_service_account.json" # Path to the temporary file
     )
   end
 end
