@@ -45,9 +45,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ruby-full
           gem install bundler
-      
+     
+      - name: Clean Flutter Build
+        run: flutter clean
+        
+     
       - name: Build Android App Bundle
         run: flutter build appbundle --release
+
+      - name: List build directory
+        run: ls -R build/app/outputs/bundle/release
+      
 
       - name: Setup Google Play Service Account Key
         run: |
