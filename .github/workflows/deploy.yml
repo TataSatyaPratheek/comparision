@@ -53,7 +53,7 @@ jobs:
           echo "storeFile=key.jks" >> ./android/key.properties
 
       - name: Deploy to Google Play
-        uses: maierj/fastlane-action@v2.3.0
+        uses: maierj/fastlane-action@v3.1.0
         with:
           lane: deploy
           subdirectory: android

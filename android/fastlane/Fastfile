@@ -3,15 +3,20 @@ default_platform(:android)
 platform :android do
   desc "Deploy a new version to Google Play"
   lane :deploy do
-    # Check if the JSON key is set
+    # Get the JSON key from environment variable
     json_key = ENV['GOOGLE_PLAY_JSON_KEY']
     
     if json_key.nil? || json_key.empty?
       UI.user_error!("Please set the GOOGLE_PLAY_JSON_KEY environment variable.")
     end
 
-    # Write the JSON key to a temporary file for authentication
+    # Write the JSON key to a temporary file
     File.write("google_play_service_account.json", json_key)
+
+    # Check if the file was created successfully
+    if !File.exist?("google_play_service_account.json")
+      UI.user_error!("Could not create service account JSON file.")
+    end
 
     upload_to_play_store(
       track: 'internal', # Options: internal, alpha, beta, production
