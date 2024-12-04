@@ -7,12 +7,12 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build_android:
     name: Build and Deploy Android
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -25,35 +25,23 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.5'
-          channel: stable
-          architecture: 'x64'
-
-      - name: Set write permissions for gem directory
-        run: |
-          sudo chmod -R 777 /var/lib/gems/3.0.0
-
-      - name: Set up GEM_HOME
-        run: |
-          echo "export GEM_HOME=$HOME/.gem" >> $GITHUB_ENV
-          echo "export PATH=$GEM_HOME/bin:$PATH" >> $GITHUB_ENV
+          flutter-version: stable
 
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build Android App Bundle
-        run: flutter build appbundle --release
-
-      - name: Setup Keystore
+      - name: Install Ruby and Bundler
         run: |
-          echo "${{ secrets.KEY_JKS }}" | base64 -d > ./android/app/key.jks
-          echo "storePassword=${{ secrets.STORE_PASSWORD }}" > ./android/key.properties
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> ./android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> ./android/key.properties
-          echo "storeFile=key.jks" >> ./android/key.properties
+          sudo apt-get update
+          sudo apt-get install -y ruby-full
+          gem install bundler
+
+      - name: Setup Google Play Service Account Key
+        run: |
+          echo "${{ secrets.GOOGLE_PLAY_JSON_KEY }}" > google_play_service_account.json
 
       - name: Deploy to Google Play
-        uses: maierj/fastlane-action@v3.1.0
+        uses: maierj/fastlane-action@v3.1.0 # Use the latest version of the action
         with:
           lane: deploy
           subdirectory: android
@@ -63,6 +51,7 @@ jobs:
   build_ios:
     name: Build and Deploy iOS
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -77,11 +66,16 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Setup CocoaPods
+        run: |
+          cd ios # Navigate to the iOS directory
+          pod install # Install pods specified in the Podfile
+
       - name: Build iOS IPA
         run: flutter build ipa --release
 
       - name: Deploy to TestFlight
-        uses: maierj/fastlane-action@v2.3.0
+        uses: maierj/fastlane-action@v3.1.0 # Use the latest version of the action
         with:
           lane: deploy
           subdirectory: ios
