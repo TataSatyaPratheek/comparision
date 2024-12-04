@@ -23,7 +23,7 @@ platform :android do
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      aab: 'build/app/outputs/bundle/release/app-release.aab', # Corrected path to AAB
+      aab: Dir.glob("build/app/outputs/bundle/release/*.aab").first
       json_key: "google_play_service_account.json" # Path to the temporary file
     )
   end
