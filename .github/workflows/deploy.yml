@@ -57,6 +57,8 @@ jobs:
         with:
           lane: deploy
           subdirectory: android
+        env:
+          GOOGLE_PLAY_JSON_KEY: ${{ secrets.GOOGLE_PLAY_JSON_KEY }} # Ensure this secret is set up in GitHub
 
   build_ios:
     name: Build and Deploy iOS
