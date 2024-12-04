@@ -32,6 +32,10 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Set write permissions for gem cache
+        run: |
+          sudo chmod -R 777 /var/lib/gems/3.0.0/cache
+
       - name: Build Android App Bundle
         run: flutter build appbundle --release
 
