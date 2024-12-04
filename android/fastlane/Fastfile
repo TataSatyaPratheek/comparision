@@ -24,7 +24,7 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
       aab: Dir.glob("build/app/outputs/bundle/release/*.aab").first,
-      json_key: "android/google_play_service_account.json" # Path to the temporary file
+      json_key: "google_play_service_account.json" # Path to the temporary file
     )
   end
 end
