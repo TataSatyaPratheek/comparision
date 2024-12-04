@@ -48,9 +48,6 @@ jobs:
       
       - name: Build Android App Bundle
         run: flutter build appbundle --release
-  
-      - name: List Build Directory
-        run: ls -R build/app/outputs/bundle/release/ # List contents to verify AAB generation
 
       - name: Setup Google Play Service Account Key
         run: |
