@@ -28,6 +28,14 @@ jobs:
           flutter-version: '3.24.5'
           channel: stable
           architecture: 'x64'
+      - name: Set write permissions for gem directory
+        run: |
+          sudo chmod -R 777 /var/lib/gems/3.0.0
+
+      - name: Set up GEM_HOME
+        run: |
+          echo "export GEM_HOME=$HOME/.gem" >> $GITHUB_ENV
+          echo "export PATH=$GEM_HOME/bin:$PATH" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: flutter pub get
